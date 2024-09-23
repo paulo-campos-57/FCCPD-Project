@@ -28,7 +28,7 @@ def receive():
     except pika.exceptions.AMQPConnectionError as e:
         print(f"Connection error: {e}")
     except KeyboardInterrupt:
-        print("Finished by user.")
+        print("Operation finished by user.")
     finally:
         if 'connection' in locals() and connection.is_open:
             connection.close()
