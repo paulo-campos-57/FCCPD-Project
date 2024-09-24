@@ -2,7 +2,7 @@ import pika
 
 
 def callback(ch, method, properties, body):
-    print(f"Mensagem recebida: {body.decode()}")
+    print(f"Received message: {body.decode()}")
 
 
 def receive():
@@ -26,9 +26,9 @@ def receive():
         channel.start_consuming()
 
     except pika.exceptions.AMQPConnectionError as e:
-        print(f"Connection error: {e}")
+        print(f"\nConnection error: {e}")
     except KeyboardInterrupt:
-        print("Operation finished by user.")
+        print("\nOperation finished by user.")
     finally:
         if 'connection' in locals() and connection.is_open:
             connection.close()
