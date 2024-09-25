@@ -1,8 +1,8 @@
 package com.example.fcmanagement;
 
-import java.util.Scanner;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Scanner;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -35,10 +35,12 @@ public class Server {
                     System.out.println("5 - About marketing");
                     System.out.println("6 - Cleaning");
                     System.out.println("7 - General warnings");
+                    System.out.println("8 - Check all the messages");
                     System.out.println("0 - Exit");
                     System.out.print("Select the option and press ENTER: ");
 
-                    int option = in.nextInt();
+                    int option = in.nextInt(); // Scanner is in
+                    in.nextLine(); // Consume leftover new line
                     String messageTopic = "";
                     boolean sendMessage = true;
 
@@ -56,6 +58,8 @@ public class Server {
                         messageTopic = "Cleaning";
                     } else if (option == 7) {
                         messageTopic = "General Warning";
+                    } else if (option == 8) {
+                        sendMessage = false;
                     } else if (option == 0) {
                         System.out.println("Server finished.");
                         break;
@@ -65,17 +69,34 @@ public class Server {
                     }
 
                     if (sendMessage) {
-                        in.nextLine(); // Consume leftover new line
 
-                        String message;
-                        System.out.println("Type the message to the client:");
-                        message = in.nextLine();
+                        System.out.println(
+                            "======================\n"+
+                            "type: \"/exit\" to go back to the channel menu"+
+                            "\n======================"
+                        );
 
-                        String date = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
-                        String fullMessage = "[" + date + "] - " + messageTopic + ": " + message;
+                        while (true) {
+                            System.out.println("\n\nType the message to the client: ");
+                            String message;
+                            message = in.nextLine();
 
-                        channel.basicPublish("", QUEUE, null, fullMessage.getBytes());
-                        System.out.println("Sent: " + fullMessage);
+                            if (message.equalsIgnoreCase("/exit")) {
+                                System.out.println("Finished by user!");
+                                break;
+                            }
+
+                            String date = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
+                            String fullMessage = "[" + date + "] - " + messageTopic + ": " + message;
+
+                            channel.basicPublish("", QUEUE, null, fullMessage.getBytes());
+
+                            System.out.println(
+                                "======================\n"+
+                                "Sent: " + fullMessage +
+                                "\n======================"
+                            );
+                        }
                     }
                 }
             }
