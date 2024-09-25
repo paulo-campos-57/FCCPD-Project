@@ -1,5 +1,9 @@
 package com.example.fcmanagement;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
@@ -11,8 +15,12 @@ import com.rabbitmq.client.ConnectionFactory;
 public class Server {
 
     private final static String QUEUE = "messages";
+    private final static String LOG_FILE = "audit_log.txt"; // Nome do arquivo de log
 
     public static void main(String[] args) throws Exception {
+        // Limpa o arquivo de log ao iniciar o programa
+        resetLogFile();
+
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("prawn-01.rmq.cloudamqp.com");
         factory.setUsername("ahpmdfzr");
@@ -23,6 +31,10 @@ public class Server {
             channel.queueDeclare(QUEUE, false, false, false, null);
 
             System.out.println("Server started.");
+
+            // Iniciar o consumidor de auditoria em uma nova thread
+            AuditConsumer auditConsumer = new AuditConsumer(channel);
+            auditConsumer.start(); // Inicia a thread
 
             try (Scanner in = new Scanner(System.in)) {
 
@@ -59,6 +71,8 @@ public class Server {
                     } else if (option == 7) {
                         messageTopic = "General Warning";
                     } else if (option == 8) {
+                        // Mostrar as mensagens auditadas
+                        showAuditLog();
                         sendMessage = false;
                     } else if (option == 0) {
                         System.out.println("Server finished.");
@@ -71,8 +85,8 @@ public class Server {
                     if (sendMessage) {
 
                         System.out.println(
-                            "======================\n"+
-                            "type: \"/exit\" to go back to the channel menu"+
+                            "======================\n" +
+                            "type: \"/exit\" to go back to the channel menu" +
                             "\n======================"
                         );
 
@@ -92,7 +106,7 @@ public class Server {
                             channel.basicPublish("", QUEUE, null, fullMessage.getBytes());
 
                             System.out.println(
-                                "======================\n"+
+                                "======================\n" +
                                 "Sent: " + fullMessage +
                                 "\n======================"
                             );
@@ -100,6 +114,28 @@ public class Server {
                     }
                 }
             }
+        }
+    }
+
+    // Método para limpar o arquivo de log ao iniciar o servidor
+    private static void resetLogFile() {
+        try (FileWriter writer = new FileWriter(LOG_FILE, false)) {
+            writer.write(""); // Escreve uma string vazia para limpar o conteúdo
+        } catch (IOException e) {
+            System.out.println("Error resetting the log file: " + e.getMessage());
+        }
+    }
+
+    // Método para exibir as mensagens auditadas
+    private static void showAuditLog() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(LOG_FILE))) {
+            String line;
+            System.out.println("Audit Log Messages: ");
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading the audit log: " + e.getMessage());
         }
     }
 }
