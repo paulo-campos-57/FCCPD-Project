@@ -1,61 +1,58 @@
-import threading
-import subprocess
-import platform
-import os
+import pika
 import utils
 
-def open_receiver_terminal(name, role):
-    
-   
-    base_dir = os.path.join('FCCPD-Project', 'fcmanagementPy', 'src')
+def callback(ch, method, properties, body):
+    print(f"Received message: {body.decode()}")
 
-   
-    receiver_file = "receiver.py"
-    receiver_path = os.path.join(base_dir, receiver_file)
-
-    receiver_path = os.path.abspath(receiver_path)
-
-    if not os.path.isfile(receiver_path):
-        print(f"Arquivo {receiver_file} não encontrado no diretório {base_dir}.")
-        return
-    
-    command = f'python {receiver_path} {name} {role}'
-
-    if platform.system() == "Windows":
-        subprocess.Popen(f'start cmd /K "cd /d {base_dir} && {command}"', shell=True)
-    elif platform.system() == "Linux":
-        subprocess.Popen(f'gnome-terminal -- bash -c "cd {base_dir} && {command}; exec bash"', shell=True)
-    elif platform.system() == "Darwin": 
-        subprocess.Popen(f'open -a Terminal "{base_dir}" && {command}', shell=True)
 
 def receive():
-    while True:
-        try:
-            name = input("Enter your name (or 0 to exit): ")
-            if name == "0":
-                print("Exiting...")
-                break
-            
-            utils.print_menu()
-            
-            choice = int(input("Enter your role in the club (1-6, or 0 to exit): "))
-            if choice == 0:
-                print("Exiting...")
-                break
-            
-            roles = {1: "Player", 2: "Coach", 3: "Medical", 4: "Janitors", 5: "Social Media", 6: "Financial"}
-            role = roles.get(choice)
+    try:
+        connection = pika.BlockingConnection(
+            pika.ConnectionParameters(
+                host='prawn-01.rmq.cloudamqp.com',
+                virtual_host='ahpmdfzr',
+                credentials=pika.PlainCredentials(
+                    'ahpmdfzr', 'peFA7z9DlvjLU6N_IgUGg2U6g_r9xo-f')
+            )
+        )
+        channel = connection.channel()
 
-            if role:
-                terminal_thread = threading.Thread(target=open_receiver_terminal, args=(name, role))
-                terminal_thread.start()
-                utils.clear_terminal()
-                print("Thread created successfully!")
-            else:
-                print("Invalid choice. Please try again.")
+        # Declara uma exchange do tipo 'topic'
+        channel.exchange_declare(exchange='topic_logs', exchange_type='topic')
 
-        except ValueError:
-            print("Invalid input. Please enter a valid number.")
+        # Cria uma fila exclusiva para o consumidor
+        result = channel.queue_declare('', exclusive=True)
+        queue_name = result.method.queue
+
+        utils.print_menu()
+        
+        choice = int(input("Type the correspondent number to select a role: "))
+        
+        roles = {1: "Player", 2: "Coach", 3: "Medical", 4: "Janitors", 5: "Social Media", 6: "Financial"}
+        role = roles.get(choice)
+        
+        if role:
+            binding_key = f"{role.lower()}.*"  # Define um padrão de chave de roteamento baseado no papel
+            channel.queue_bind(exchange='topic_logs', queue=queue_name, routing_key=binding_key)
+            print(f"Bound to role: {role}")
+        else:
+            print("Invalid role.")
+            return
+
+        utils.clear_terminal()
+
+        print("Awaiting messages... To leave, press CTRL+C")
+        channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)
+        channel.start_consuming()
+
+    except pika.exceptions.AMQPConnectionError as e:
+        print(f"\nConnection error: {e}")
+    except KeyboardInterrupt:
+        print("\nOperation finished by user.")
+    finally:
+        if 'connection' in locals() and connection.is_open:
+            connection.close()
+
 
 if __name__ == '__main__':
     receive()
