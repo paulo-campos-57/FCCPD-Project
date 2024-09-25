@@ -1,9 +1,9 @@
 import pika
-
+from models import Players, Coach, Socialmedia, Financial, Janitors, Medical
+import utils
 
 def callback(ch, method, properties, body):
     print(f"Received message: {body.decode()}")
-
 
 def receive():
     try:
@@ -21,6 +21,18 @@ def receive():
 
         channel.basic_consume(
             queue='messages', on_message_callback=callback, auto_ack=True)
+        
+        name = input("Enter your name: ")
+        utils.imprimir_menu()
+        
+        choice = int(input("Enter your role in the club: "))
+        if choice == 1:
+            player = Players(name)
+        elif choice == 2:
+            coach = Coach(name) 
+        else:
+            print("Invalid choice. Exiting.")
+            return
 
         print("Awaiting messages... to leave, press CTRL+C")
         channel.start_consuming()
@@ -29,10 +41,11 @@ def receive():
         print(f"\nConnection error: {e}")
     except KeyboardInterrupt:
         print("\nOperation finished by user.")
+    except ValueError:
+        print("Invalid input. Please enter a number.")
     finally:
         if 'connection' in locals() and connection.is_open:
             connection.close()
-
 
 if __name__ == '__main__':
     receive()
