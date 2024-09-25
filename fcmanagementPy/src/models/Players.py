@@ -1,8 +1,8 @@
 class Player:
     
-    def __init__(self):
-        self.id = 05
-        self.name = "Player"
+    def __init__(self,name ):
+        self.id = 5
+        self.name = name
 
     def getId(self):
         return self.id

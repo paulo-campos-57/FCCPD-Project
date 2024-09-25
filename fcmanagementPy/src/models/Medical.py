@@ -1,8 +1,8 @@
 class Medical:
     
-    def __init__(self):
-        self.id = 01
-        self.name = "Medical"
+    def __init__(self,name):
+        self.id = 1
+        self.name = name
         
     def getId(self):
         return self.id

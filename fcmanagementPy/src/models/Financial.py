@@ -1,8 +1,8 @@
 class Financial: 
     
-    def __init__(self):
-        self.id = 02
-        self.name = "Financial"
+    def __init__(self,name):
+        self.id = 2
+        self.name = name
         
     def getId(self):
         return self.id

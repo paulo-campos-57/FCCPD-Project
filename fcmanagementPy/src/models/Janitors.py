@@ -1,8 +1,8 @@
 class Janitors:
     
-    def __init__(self):
-        self.id = 04
-        self.name = "Janitors"
+    def __init__(self, name):
+        self.id = 4
+        self.name = name
         
     def getId(self):
         return self.id
