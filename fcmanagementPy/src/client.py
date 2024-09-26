@@ -1,5 +1,6 @@
 import pika
 import utils
+import time
 
 def callback(ch, method, properties, body):
     print(f"Received message: {body.decode()}")
@@ -35,6 +36,7 @@ def receive():
             binding_key = f"{role.lower()}.*"  # Define um padrão de chave de roteamento baseado no papel
             channel.queue_bind(exchange='topic_logs', queue=queue_name, routing_key=binding_key)
             print(f"Bound to role: {role}")
+            time.sleep(2)
         else:
             print("Invalid role.")
             return

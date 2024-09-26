@@ -1,8 +1,6 @@
 package com.example.fcmanagement;
 
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -28,7 +26,8 @@ public class AuditConsumer extends Thread {
             };
 
             // Consumir mensagens da fila
-            channel.basicConsume(QUEUE, true, deliverCallback, consumerTag -> {});
+            channel.basicConsume(QUEUE, true, deliverCallback, consumerTag -> {
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }
