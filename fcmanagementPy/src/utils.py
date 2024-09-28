@@ -1,10 +1,12 @@
 import os
 
+
 def clear_terminal():
     if os.name == 'nt':
         os.system('cls')
-    else:  
+    else:
         os.system('clear')
+
 
 def print_menu():
     print("Roles menu\n")
@@ -14,4 +16,3 @@ def print_menu():
     print("4 - Janitors")
     print("5 - Social Media")
     print("6 - Financial")
-

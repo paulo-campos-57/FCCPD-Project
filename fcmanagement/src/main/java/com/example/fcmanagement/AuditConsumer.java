@@ -9,16 +9,15 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DeliverCallback;
 
 public class AuditConsumer extends Thread {
+
     private final static String QUEUE = "audit_queue"; // Nome personalizado para a fila
     private final static String EXCHANGE = "headers_logs"; // Nome do exchange
     private final Channel channel;
-    
-    
-    
+
     public AuditConsumer(Channel channel) {
         this.channel = channel;
     }
-    
+
     @Override
     public void run() {
         try {
@@ -30,7 +29,6 @@ public class AuditConsumer extends Thread {
 
             channel.queueDeclare(QUEUE, true, false, false, null);
             channel.queueBind(QUEUE, EXCHANGE, "", headers); // Associar a fila ao exchange com os headers
-
 
             // Callback para processar mensagens recebidas
             DeliverCallback deliverCallback = (consumerTag, delivery) -> {

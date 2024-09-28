@@ -1,8 +1,10 @@
 import pika
 import sys
 
+
 def callback(ch, method, properties, body):
     print(f"Received message: {body.decode()}")
+
 
 def receive_messages(name, role):
     try:
@@ -21,7 +23,8 @@ def receive_messages(name, role):
         channel.basic_consume(
             queue='messages', on_message_callback=callback, auto_ack=True)
 
-        print(f"Hello, {name}. Here you will receive messages related to your role: {role}")
+        print(
+            f"Hello, {name}. Here you will receive messages related to your role: {role}")
         print("Awaiting messages... Press CTRL+C to exit.")
         channel.start_consuming()
 
@@ -32,6 +35,7 @@ def receive_messages(name, role):
     finally:
         if 'connection' in locals() and connection.is_open:
             connection.close()
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:

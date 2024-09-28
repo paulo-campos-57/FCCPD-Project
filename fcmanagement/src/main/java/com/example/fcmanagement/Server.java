@@ -32,9 +32,7 @@ public class Server {
         factory.setVirtualHost("ahpmdfzr");
 
         try (
-            Connection connection = factory.newConnection();
-            Channel channel = connection.createChannel()
-            ) {
+                Connection connection = factory.newConnection(); Channel channel = connection.createChannel()) {
 
             channel.exchangeDeclare(EXCHANGE, "headers");
 
@@ -86,7 +84,7 @@ public class Server {
                         String fullMessage = "[" + date + "] - " + messageTopic + ": " + message;
 
                         List<String> roles = determineRoles(option);
-                        
+
                         for (String role : roles) {
                             // Create headers
                             Map<String, Object> headers = new HashMap<>();
