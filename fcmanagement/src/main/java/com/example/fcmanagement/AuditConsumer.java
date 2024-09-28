@@ -6,8 +6,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class AuditConsumer extends Thread {
-    private final static String QUEUE = "messages";
+    private final static String QUEUE = "headers";
     private final Channel channel;
+
+    // Declaring the queue for auditing
+    channel.queueDeclare(QUEUE, true, false, false, null);
 
     public AuditConsumer(Channel channel) {
         this.channel = channel;
