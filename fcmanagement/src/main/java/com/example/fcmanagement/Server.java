@@ -121,19 +121,19 @@ public class Server {
     private static List<String> determineRoles(int option) {
         switch (option) {
             case 1: // Training Day
-                return Arrays.asList("player", "coach");
+                return Arrays.asList("player", "coach", "audit");
             case 2: // Player Injury
-                return Arrays.asList("coach", "medical");
+                return Arrays.asList("coach", "medical", "audit");
             case 3: // New player arrival
-                return Arrays.asList("coach", "social_media", "financial");
+                return Arrays.asList("coach", "social_media", "financial", "audit");
             case 4: // Player leaving the club
-                return Arrays.asList("coach", "financial");
+                return Arrays.asList("coach", "financial", "audit");
             case 5: // Marketing warning
-                return Arrays.asList("social_media");
+                return Arrays.asList("social_media", "audit");
             case 6: // Cleaning
-                return Arrays.asList("janitor", "coach");
+                return Arrays.asList("janitor", "coach", "audit");
             case 7: // General Warning
-                return Arrays.asList("player", "coach", "medical", "janitor", "social_media", "financial");
+                return Arrays.asList("player", "coach", "medical", "janitor", "social_media", "financial", "audit");
             default:
                 return Arrays.asList("unknown");
         }
