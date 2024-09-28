@@ -5,17 +5,17 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.Arrays;
-import java.util.List;
 
+import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import com.rabbitmq.client.AMQP;
 
 public class Server {
 
@@ -31,7 +31,11 @@ public class Server {
         factory.setPassword("peFA7z9DlvjLU6N_IgUGg2U6g_r9xo-f");
         factory.setVirtualHost("ahpmdfzr");
 
-        try (Connection connection = factory.newConnection(); Channel channel = connection.createChannel()) {
+        try (
+            Connection connection = factory.newConnection();
+            Channel channel = connection.createChannel()
+            ) {
+
             channel.exchangeDeclare(EXCHANGE, "headers");
 
             System.out.println("Server started.");
